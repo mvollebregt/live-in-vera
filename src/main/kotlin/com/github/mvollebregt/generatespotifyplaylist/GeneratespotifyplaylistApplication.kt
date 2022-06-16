@@ -61,7 +61,10 @@ class GeneratespotifyplaylistApplication : CommandLineRunner {
         println("Fetching concerts\n")
         return Jsoup.connect(sourceUrl).get()
             .select(cssQuery)
-            .map { it.textNodes()[0].text() }
+            .flatMap { it.textNodes() }
+            .map { it.text() }
+            .map { it.trimStart(' ', '+') }
+            .distinct()
     }
 
     private fun findTopTrackForArtist(artistName: String): String? {
