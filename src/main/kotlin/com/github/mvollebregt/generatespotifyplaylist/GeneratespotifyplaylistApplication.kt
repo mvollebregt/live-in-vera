@@ -68,14 +68,21 @@ class GeneratespotifyplaylistApplication : CommandLineRunner {
         val foundArtists = spotifyApi.searchArtists(artistName).build().execute().items
         if (foundArtists.isNotEmpty()) {
             val artist = foundArtists[0]
-            val topTracks = spotifyApi.getArtistsTopTracks(artist.id, CountryCode.NL).build().execute()
-            if (topTracks.isNotEmpty()) {
-                println("${artist.name} - ${topTracks[0].name}")
-                return topTracks[0].uri
+            if (adjustForComparing(artistName).equals(adjustForComparing(artist.name))) {
+                val topTracks = spotifyApi.getArtistsTopTracks(artist.id, CountryCode.NL).build().execute()
+                if (topTracks.isNotEmpty()) {
+                    println("${artist.name} - ${topTracks[0].name}")
+                    return topTracks[0].uri
+                }
+            } else {
+                println("Could not find $artistName")
             }
         }
         return null
     }
+
+    private fun adjustForComparing(artistName: String) =
+        artistName.trim().lowercase().split("\\W+".toRegex()).joinToString(" ")
 }
 
 fun main(args: Array<String>) {
